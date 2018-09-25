@@ -3,7 +3,7 @@
 * @Author: wangxuan
 * @Date:   2018-09-24 22:00:15
 * @Last Modified by:   wangxuan
-* @Last Modified time: 2018-09-24 22:10:03
+* @Last Modified time: 2018-09-25 23:04:23
 */
 
 {
@@ -34,3 +34,104 @@
         console.log('key', key);
     }
 }
+
+{
+    // 状态机
+    let state = function* () {
+        while(1) {
+            yield 'A';
+            yield 'B';
+            yield 'C';
+        }
+    }
+
+    let status = state();
+    console.log(status.next());
+    console.log(status.next());
+    console.log(status.next());
+    console.log(status.next());
+    console.log(status.next());
+}
+
+// {
+//     let state = async function () {
+//         while(1) {
+//             await 'A';
+//             await 'B';
+//             await 'C';
+//         }
+//     }
+
+//     let status = state();
+//     console.log(status.next());
+//     console.log(status.next());
+//     console.log(status.next());
+//     console.log(status.next());
+//     console.log(status.next());
+// }
+
+{
+    // 抽奖次数限制
+    let draw = function(count) {
+        // 具体抽奖逻辑
+
+        console.info(`剩余${count}次`);
+    }
+
+    let residue = function* (count) {
+        while (count > 0) {
+            count--;
+            yield draw(count);
+        }
+    }
+
+    let star = residue(5);
+    let btn = document.createElement('button');
+    btn.id = 'start';
+    btn.textContent = '抽奖';
+    document.body.appendChild(btn);
+    document.getElementById('start').addEventListener('click', function() {
+        star.next();
+    }, false)
+}
+
+{
+    // 长轮询
+    let ajax = function* () {
+        yield new Promise(function(resolve, reject) {
+            setTimeout(function() {
+                resolve({code: 0})
+            }, 200);
+        })
+    }
+
+    let pull = function() {
+        let generator = ajax();
+        let step = generator.next();
+
+        step.value.then(function(d) {
+            if (d.code != 0) {
+                setTimeout(function() {
+                    console.info('wait');
+                    pull();
+                }, 1000);
+            } else {
+                console.info(d);
+            }
+        })
+    }
+
+    pull();
+}
+
+
+
+
+
+
+
+
+
+
+
+
